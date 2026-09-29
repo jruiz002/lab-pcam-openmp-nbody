@@ -1,0 +1,6 @@
+$ gcc-14 -O2 -std=c17 -fopenmp src/nbody_seq.c -o build/nbody_seq -lm
+[exit code: 0] compilacion sin errores
+$ gcc-14 -O2 -std=c17 -fopenmp src/nbody_parallel.c -o build/nbody_parallel -lm
+[exit code: 0] compilacion sin errores
+$ gcc-14 -O2 -std=c17 -fopenmp src/nbody_optimized.c -o build/nbody_optimized -lm
+[exit code: 0] compilacion sin errores

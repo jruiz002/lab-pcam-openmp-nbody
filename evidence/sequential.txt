@@ -1,0 +1,9 @@
+Student: Jose Ruiz, Dilary Cruz, Gerardo Fernandez
+Executable: ./build/nbody_seq
+Mode: sequential
+N: 5000 | Steps: 10 | Seed: 42
+Threads requested: 1 | Threads used: 1
+Schedule: sequential | Chunk: -
+Elapsed: 0.379 s
+Checksum: 492034.836621
+Processors reported by OpenMP: 10 | Max threads (omp_get_max_threads): 10

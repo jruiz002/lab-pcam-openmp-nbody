@@ -1,0 +1,9 @@
+Student: Jose Ruiz, Dilary Cruz, Gerardo Fernandez
+Executable: ./build/nbody_optimized
+Mode: parallel-optimized (sync: reduction)
+N: 5000 | Steps: 10 | Seed: 42
+Threads requested: 8 | Threads used: 8
+Schedule: dynamic | Chunk: 64
+Elapsed: 0.086 s
+Checksum: 492034.836621
+Processors reported by OpenMP: 10 | Max threads (omp_get_max_threads): 8
