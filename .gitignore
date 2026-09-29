@@ -1,0 +1,18 @@
+# Executables
+nbody_seq
+build/
+nbody_parallel
+nbody_optimized
+test_omp
+
+# Object files
+*.o
+
+# macOS specific
+.DS_Store
+
+# Temporary / IDE files
+.vscode/
+.idea/
+*.swp
+*~
