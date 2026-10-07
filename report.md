@@ -1,11 +1,11 @@
 ---
 title: "PCAM aplicado con OpenMP: Simulación gravitacional N-Body en 2D"
 subtitle: "Computación Paralela y Distribuida — Laboratorio PCAM + OpenMP"
-author: "Jose Ruiz (carné: ________) · Dilary Cruz (carné: ________) · Gerardo Fernandez (carné: ________)"
-date: "Modalidad: grupal (3 integrantes) · Fecha de entrega: ________"
+author: "Jose Ruiz (carné: 23719) · Dilary Cruz (carné: 231010) · Gerardo Fernandez (carné: 23763)"
+date: "Modalidad: grupal (3 integrantes) · Fecha de entrega: 30/09/2026"
 geometry: margin=2cm
 fontsize: 10pt
-mainfont: Helvetica
+mainfont: Arial
 header-includes:
   - \usepackage{float}
   - \floatplacement{figure}{H}
@@ -62,6 +62,8 @@ Chunks adicionales con 8 hilos (T en s): **static** 1 / 512 = B 0.113 / 0.201, C
 
 **Corrección numérica.** El checksum es **492034.836621** en A, B y C (6 decimales idénticos). La diferencia máxima frente a A es exactamente $0$ para B (mismo orden de sumas por cuerpo) y entre $1.1\times10^{-8}$ y $2.2\times10^{-8}$ para C. Esta variación se debe únicamente a que la suma de fuerzas de C se hace en otro orden (reducción por hilo, y $F_{ji}=-F_{ij}$ calculado una vez), y la suma en punto flotante no es asociativa; es un error de redondeo, no una divergencia física.
 
+\newpage
+
 # 5. Preguntas de análisis
 
 1. **Unidad mínima.** Una interacción $(i,j)$ (~20 flops). Como tarea individual, el costo de despachar la tarea y sincronizar es mucho mayor que su cálculo. Por eso se aglomeran las $N$ interacciones de un cuerpo (A de PCAM).
@@ -72,6 +74,8 @@ Chunks adicionales con 8 hilos (T en s): **static** 1 / 512 = B 0.113 / 0.201, C
 6. **¿Menos operaciones = más rápida?** No siempre. C hace la mitad de interacciones, y con `dynamic` 64 gana a B (0.069 vs 0.089 s, S = 5.17 vs 4.01). Pero con `static` por default y 2 o 4 hilos C es *más lenta* que B (2 hilos: 0.346 vs 0.281 s) por el desbalance triangular y porque cada hilo debe inicializar y combinar sus copias de `fx, fy`. Con `guided` default (0.123 vs 0.099 s) también pierde. Además, C con `atomic` (0.546 s) o `critical` (2.59 s) es mucho más lenta que la secuencial, pese a hacer menos operaciones aritméticas: la sincronización domina.
 7. **Speedup y eficiencia (B, static default / mejor C).** 2 hilos: S = 1.26 / E = 0.63 (B), S = 1.54 / E = 0.77 (C dyn 64). 4 hilos: S = 2.36 / E = 0.59 (B), S = 3.03 / E = 0.76 (C). 8 hilos: S = 3.20 / E = 0.40 (B static), S = 4.01 / E = 0.50 (B dynamic 64), S = 5.17 / E = 0.65 (C dynamic 64). Deja de escalar linealmente desde 2 hilos (E < 1) y se degrada más al pasar a 8, sobre todo porque el M2 Pro tiene solo 6 núcleos de alto rendimiento y 4 de eficiencia más lentos: 8 hilos ya usan núcleos E, y `dynamic` lo compensa mejor que `static`. También influye que el tiempo total es de ~0.1 s, así que el costo fijo de crear equipos de hilos y la parte secuencial (Amdahl) pesan.
 8. **¿64 cores = 8x?** No lo esperaríamos. Con 8 hilos la eficiencia ya cayó a 0.40–0.65, y el speedup no fue 8x con 8 hilos sino 3.2–5.2x. Con 64 hilos y sólo $N=5000$ (78 cuerpos por hilo), el overhead de scheduling, la creación del equipo de hilos, y en C el costo de combinar 64 copias de $2N$ doubles crecerían mientras el trabajo por hilo se reduce (Amdahl y sobrecarga). Habría que aumentar $N$ (trabajo $O(N^2)$) para escalar de forma útil.
+
+\newpage
 
 # 6. Conclusiones
 
