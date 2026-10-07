@@ -1,0 +1,31 @@
+\section{Diseño PCAM}
+
+\subsection*{Partition}
+La unidad paralelizable es el \emph{cálculo de la fuerza total sobre el cuerpo $i$} en un paso, es
+decir, una iteración del ciclo externo. La unidad mínima de trabajo es una interacción $(i,j)$, pero no
+se usa como tarea porque su costo ($\sim$20 flops) es mucho menor que el de despacharla. Las tareas de
+un mismo paso son independientes entre sí, ya que todas leen las posiciones del instante $t$. Entre
+pasos existe una dependencia estricta ($t+1$ necesita el estado final de $t$), y dentro de un paso hay
+una barrera entre calcular fuerzas y mover cuerpos. En B y C, el final del \code{parallel for}
+proporciona esa barrera de forma implícita.
+
+\subsection*{Communication}
+Los datos \code{x}, \code{y} y \code{mass} de todos los cuerpos son de \emph{solo lectura} durante el
+cálculo de fuerzas y se comparten sin protección. En B cada hilo escribe únicamente \code{vx[i]} y
+\code{vy[i]} de los cuerpos que le fueron asignados, por lo que no existen condiciones de carrera. En C,
+en cambio, la tercera ley de Newton hace que el par $(i,j)$ escriba en los acumuladores de \emph{dos}
+cuerpos (\code{fx[i]} y \code{fx[j]}), y $j$ puede estar siendo procesado por otro hilo: ahí se
+produce la carrera. Los acumuladores \code{fx} y \code{fy} son lo único que debe sincronizarse.
+
+\subsection*{Agglomeration}
+Se aglomeran todas las interacciones de un cuerpo en una sola tarea (unos $N$ pares por tarea) y, mediante
+el parámetro \code{chunk}, varios cuerpos consecutivos por asignación del planificador. Se compararon
+chunks de 1, 8, 64 y 512, además del valor por defecto, para observar el efecto de la granularidad.
+
+\subsection*{Mapping}
+La asignación se realiza con \code{schedule(runtime)}, lo que permite comparar \code{static},
+\code{dynamic} y \code{guided} sin recompilar. En B todas las tareas cuestan lo mismo ($N-1$
+interacciones), así que \code{static} sería la opción natural. En C el ciclo
+\code{j = i+1..N} es \emph{triangular}: la tarea $i$ cuesta $N-i-1$ pares y, con \code{static} por
+bloques y 8 hilos, el primer hilo recibe aproximadamente 15 veces más trabajo que el último. Este
+desbalance explica por qué \code{dynamic} con chunks pequeños resulta mucho mejor en C.

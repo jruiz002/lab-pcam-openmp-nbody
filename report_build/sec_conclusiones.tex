@@ -1,0 +1,17 @@
+\section{Conclusiones}
+
+\begin{itemize}
+\item El paralelismo por cuerpo es natural para N-Body: las tareas son independientes dentro de un
+paso y la única sincronización necesaria es la barrera entre fases y entre pasos.
+\item La mejor configuración fue la versión C con \code{reduction}, \code{dynamic}, chunk 64 y 8
+hilos: 0.069\,s, speedup de 5.17 y eficiencia de 0.65, con resultados numéricamente equivalentes a la
+versión secuencial.
+\item La estrategia contra la condición de carrera fue el factor más determinante:
+\code{reduction} ($5.18\times$) frente a \code{atomic} ($0.65\times$) y \code{critical}
+($0.14\times$).
+\item El schedule y el chunk importan: \code{dynamic} con chunks de 8 a 64 fue el mejor en ambas
+versiones, mientras que chunks de 512 y \code{guided} por defecto fueron los peores, especialmente con
+la carga triangular de C.
+\item Limitaciones: con $N = 5000$ y 10 pasos las corridas duran menos de 0.4\,s, por lo que existe
+ruido de medición, y los núcleos heterogéneos del M2 Pro limitan la eficiencia con 8 hilos.
+\end{itemize}

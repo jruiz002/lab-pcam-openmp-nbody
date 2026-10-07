@@ -1,0 +1,35 @@
+\section{Resumen y entorno de medición}
+
+Se implementaron tres versiones en C (C17) con OpenMP de una simulación gravitacional N-Body en dos
+dimensiones y se analizaron con la metodología PCAM:
+\begin{itemize}
+  \item \textbf{A} --- \code{nbody\_seq.c}: versión secuencial (línea base).
+  \item \textbf{B} --- \code{nbody\_parallel.c}: paralela directa; cada cuerpo acumula su propia fuerza.
+  \item \textbf{C} --- \code{nbody\_optimized.c}: cada par $(i,j)$ se calcula una sola vez usando
+        $F_{ij} = -F_{ji}$.
+\end{itemize}
+
+Todas las versiones usan \code{seed = 42}, $N = 5000$ cuerpos, 10 pasos y $\Delta t = 0.01$, y miden el
+tiempo con \code{omp\_get\_wtime()}. Cada configuración se ejecutó tres veces y se reporta el promedio
+(\code{results.csv}, generado por \code{run\_experiments.sh}). El código fuente completo está en el repositorio \repo.
+
+\begin{table}[H]
+\centering
+\caption{Entorno de medición.}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Procesador     & Apple M2 Pro, 10 núcleos (6 de rendimiento + 4 de eficiencia) \\
+Memoria        & 16 GB \\
+OpenMP         & \code{omp\_get\_num\_procs()} $= 10$ \\
+Compilador     & GCC 14.2, \code{-O2 -std=c17 -fopenmp} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Los 8 hilos se reparten entre núcleos heterogéneos y una corrida completa dura menos de 0.4\,s, por lo
+que la variación entre corridas es de varios por ciento; diferencias menores a $\sim$5\,\% no se
+consideran concluyentes.
+
+La mejor configuración obtenida fue la versión C con \code{reduction}, \code{schedule(dynamic, 64)} y
+8 hilos: 0.069\,s frente a 0.355\,s de la secuencial, es decir, $S = 5.17$ y $E = 0.65$, con el mismo
+checksum que la versión secuencial.

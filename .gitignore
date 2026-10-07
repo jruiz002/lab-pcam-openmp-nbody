@@ -16,3 +16,7 @@ test_omp
 .idea/
 *.swp
 *~
+
+# Archivos auxiliares de LaTeX y figuras generadas
+report_build/out/
+report_build/generado/

@@ -1,0 +1,43 @@
+% Preámbulo común de los documentos del laboratorio
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[letterpaper,margin=2.5cm,headheight=14pt]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{generado/}{../evidence/}{./}}
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+\setlist{itemsep=0.25em,topsep=0.3em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\itshape Laboratorio PCAM + OpenMP: \subtitulodoc}
+\fancyhead[R]{\small\itshape Computación Paralela y Distribuida}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lstset{
+  language=C, basicstyle=\ttfamily\footnotesize, columns=fullflexible,
+  keywordstyle=\bfseries, commentstyle=\itshape\color{black!60},
+  frame=lines, framesep=4pt, xleftmargin=1em, xrightmargin=1em,
+  showstringspaces=false, upquote=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
+}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\repo}{\href{https://github.com/jruiz002/lab-pcam-openmp-nbody}{\texttt{github.com/jruiz002/lab-pcam-openmp-nbody}}}
+
+% \input expandible para filas de tablas generadas (antes de \midrule/\bottomrule)
+\makeatletter\let\tabinput\@@input\makeatother

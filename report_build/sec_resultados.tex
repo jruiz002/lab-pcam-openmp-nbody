@@ -1,0 +1,44 @@
+\section{Resultados}
+
+Se define el speedup como $S(p) = T_1/T_p$, con $T_1 = 0.355$\,s (versión secuencial), y la eficiencia
+como $E(p) = S(p)/p$. Todos los valores corresponden a $N = 5000$, 10 pasos y el promedio de tres
+corridas. La tabla~\ref{tab:resultados} muestra los tiempos, el número de hilos y las métricas de cada
+configuración principal; las figuras~\ref{fig:speedup} y~\ref{fig:schedules} comparan el rendimiento.
+
+\begin{table}[H]
+\centering
+\caption{Tiempo promedio $T$ (s), speedup $S$ y eficiencia $E$ por configuración.}
+\label{tab:resultados}
+\small
+\begin{tabular}{@{}rllrrrrrr@{}}
+\toprule
+ & & & \multicolumn{3}{c}{B (directa)} & \multicolumn{3}{c}{C (pares, \code{reduction})} \\
+\cmidrule(lr){4-6}\cmidrule(l){7-9}
+Hilos & Schedule & Chunk & $T$ & $S$ & $E$ & $T$ & $S$ & $E$ \\
+\midrule
+\tabinput generado/tabla_resultados.tex
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.68\textwidth]{speedup.pdf}
+\caption{Speedup en función del número de hilos: B con \code{static} por defecto y C con
+\code{dynamic} (chunk 64), comparados con el speedup ideal.}
+\label{fig:speedup}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{schedules.pdf}
+\caption{Tiempo con 8 hilos según el \code{schedule} y el \code{chunk}. La línea discontinua indica
+el tiempo de la versión secuencial.}
+\label{fig:schedules}
+\end{figure}
+
+\paragraph{Corrección numérica.} El checksum es \code{492034.836621} en A, B y C (seis decimales
+idénticos). La diferencia máxima frente a A es exactamente 0 para B, que suma en el mismo orden, y
+está entre $1.1\times10^{-8}$ y $2.2\times10^{-8}$ para C. Esa variación se debe a que C suma las
+fuerzas en otro orden (reducción por hilo y $F_{ji} = -F_{ij}$ calculada una sola vez), y la suma en
+punto flotante no es asociativa: es error de redondeo, no una divergencia física.

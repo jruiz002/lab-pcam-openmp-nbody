@@ -1,0 +1,33 @@
+% Portada basada en la plantilla Portada.docx de la UVG.
+% Antes de \input definir \subtitulodoc{...}
+\begin{titlepage}
+\newgeometry{left=2.54cm,right=2.54cm,top=1.27cm,bottom=2.54cm}
+\thispagestyle{empty}
+\fontfamily{ptm}\selectfont
+\begin{flushleft}
+\setlength{\parskip}{0pt}
+\linespread{1.5}\selectfont
+Universidad del Valle de Guatemala\\
+Facultad de Ingeniería\\
+Computación Paralela y Distribuida
+\end{flushleft}
+
+\vspace*{1.45in}
+\begin{center}
+\includegraphics[width=1.54in]{uvg_logo.png}
+
+\vspace{0.9in}
+{\LARGE\bfseries \subtitulodoc}\\[0.8em]
+{\large Laboratorio PCAM + OpenMP}\\[0.3em]
+Simulación gravitacional N-Body en 2D
+
+\vfill
+Dilary Sarahí Cruz López - 231010\\[0.2em]
+Gerardo Fernandez - 23763\\[0.2em]
+Jose Ruiz - 23719\\[1.4em]
+Guatemala, 30 de septiembre de 2026\\[0.8em]
+{\small Repositorio: \repo}
+\vspace*{0.6in}
+\end{center}
+\restoregeometry
+\end{titlepage}

@@ -1,0 +1,51 @@
+\section{Preguntas de análisis}
+
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.}]
+\item \textbf{Unidad mínima.} Una interacción $(i,j)$, de unos 20 flops. Como tarea individual, el
+costo de despacharla y sincronizar supera con creces el del cálculo; por eso se aglomeran las $N$
+interacciones de un cuerpo en una tarea.
+
+\item \textbf{Datos compartidos.} Son de solo lectura \code{x}, \code{y} y \code{mass} durante el
+cálculo de fuerzas. Requieren protección, en C, los acumuladores \code{fx} y \code{fy} (resuelto con
+\code{reduction}). En B no hay escrituras compartidas.
+
+\item \textbf{Efecto del chunk.} Un chunk muy grande perjudica: con 8 hilos y \code{static} 512, B
+pasa de 0.111 a 0.201\,s (con \code{dynamic} 512: 0.117\,s en B y 0.096\,s en C), porque quedan unos
+10 bloques y el último desbalancea la carga. Un chunk de 1 en \code{dynamic} paga más overhead de
+planificación (chunk 1 frente a 8: 0.129 vs.\ 0.093\,s en B y 0.073 vs.\ 0.069\,s en C). El óptimo es
+intermedio (8--64), donde el overhead se amortiza sin perder balance.
+
+\item \textbf{\code{static} vs.\ \code{dynamic} vs.\ \code{guided}.} En ambas versiones
+\code{dynamic} fue el mejor (B 0.089\,s y C 0.069\,s con chunk 64, frente a 0.111 y 0.116\,s con
+\code{static}). En B, con carga uniforme, la ventaja ($\sim$20\,\%) se atribuye a que \code{dynamic}
+absorbe la interferencia del sistema operativo y la heterogeneidad de los núcleos. En C la carga
+triangular amplifica el efecto: \code{static} por defecto deja al primer hilo con unas 15 veces la
+carga del último. \code{guided} fue intermedio en B (0.099\,s) y peor en C con chunk por defecto
+(0.123\,s), porque sus primeros bloques son grandes y caen en las filas más costosas.
+
+\item \textbf{Condición de carrera en C.} El par $(i,j)$ actualiza \code{fx[i]}, \code{fy[i]},
+\code{fx[j]} y \code{fy[j]}; otro hilo que procesa $j$ como su propio $i$ escribe el mismo
+\code{fx[j]} en paralelo, y se pierden actualizaciones. Se resolvió con acumuladores privados por hilo
+(\code{reduction} sobre arreglos) y se comparó con \code{atomic} y \code{critical}.
+
+\item \textbf{¿Menos operaciones implica más rapidez?} No siempre. C hace la mitad de interacciones y,
+con \code{dynamic} 64, supera a B (0.069 vs.\ 0.089\,s). Sin embargo, con \code{static} por defecto y
+2 hilos es más lenta (0.346 vs.\ 0.281\,s) por el desbalance triangular y el costo de inicializar y
+combinar las copias privadas; con \code{guided} por defecto también pierde (0.123 vs.\ 0.099\,s). Con
+\code{atomic} (0.546\,s) o \code{critical} (2.59\,s) es incluso más lenta que la secuencial: domina la
+sincronización.
+
+\item \textbf{Speedup y eficiencia.} Con 2 hilos: $S = 1.26$, $E = 0.63$ (B) y $S = 1.54$,
+$E = 0.77$ (C). Con 4 hilos: $S = 2.36$, $E = 0.59$ (B) y $S = 3.03$, $E = 0.76$ (C). Con 8 hilos:
+$S = 3.20$, $E = 0.40$ (B, \code{static}); $S = 4.01$, $E = 0.50$ (B, \code{dynamic} 64) y
+$S = 5.17$, $E = 0.65$ (C). El escalamiento deja de ser lineal desde 2 hilos y se degrada más con 8,
+sobre todo porque el M2 Pro solo tiene 6 núcleos de alto rendimiento. También pesan el costo fijo de
+crear el equipo de hilos y la parte secuencial (ley de Amdahl), dado que el tiempo total es de unos
+0.1\,s.
+
+\item \textbf{¿64 núcleos implican 8 veces más rapidez?} No. Con 8 hilos la eficiencia ya bajó a
+0.40--0.65 y el speedup fue de 3.2 a 5.2, no de 8. Con 64 hilos y $N = 5000$ (78 cuerpos por hilo),
+el overhead de planificación, la creación de hilos y, en C, la combinación de 64 copias de $2N$
+valores crecerían mientras el trabajo por hilo disminuye. Para escalar de forma útil habría que
+aumentar $N$, ya que el trabajo crece como $O(N^2)$.
+\end{enumerate}

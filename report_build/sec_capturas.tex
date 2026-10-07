@@ -1,0 +1,35 @@
+\section{Capturas de compilación y ejecución}
+
+Las siguientes capturas corresponden a las ejecuciones reales; las salidas en texto se encuentran en la
+carpeta \code{evidence/} del repositorio (\repo). Cada ejecución reporta el número de hilos solicitados y
+utilizados, el schedule, el tiempo y el checksum.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{compile.png}
+\caption{Compilación de las tres versiones con \code{gcc -O2 -std=c17 -fopenmp}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{sequential.png}
+\caption{Ejecución secuencial (A): 1 hilo, 0.379\,s.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{parallel.png}
+\caption{Ejecución paralela directa (B): 8 hilos, \code{dynamic} 64, 0.110\,s.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{optimized.png}
+\caption{Ejecución optimizada por pares (C): 8 hilos, \code{dynamic} 64, \code{reduction}, 0.086\,s.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{hardware.png}
+\caption{Hardware: \code{omp\_get\_num\_procs()} y \code{omp\_get\_max\_threads()}.}
+\end{figure}
